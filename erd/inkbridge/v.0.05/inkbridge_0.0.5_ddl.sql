@@ -317,7 +317,7 @@ CREATE TABLE `coupon_type`
 CREATE TABLE `coupon_status`
 (
     `coupon_status_id` INT         NOT NULL,
-    `coupon_status`    VARCHAR(30) NOT NULL,
+    `coupon_status_name`    VARCHAR(30) NOT NULL,
 
     CONSTRAINT `coupon_status_pk` PRIMARY KEY (`coupon_status_id`)
 );
