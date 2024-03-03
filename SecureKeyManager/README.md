@@ -226,4 +226,4 @@ public class JpaConfig {
 
 
 ## Reference
-[NHN Cloud Document - Security](https://docs.nhncloud.com/ko/Security/Secure%20Key%20Manager/ko/overview/);
+[NHN Cloud Document - Security](https://docs.nhncloud.com/ko/Security/Secure%20Key%20Manager/ko/overview/)
