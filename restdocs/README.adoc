@@ -69,6 +69,22 @@ class PointPolicyControllerTest {
                     fieldWithPath("[].createdAt").description("변경일자")
                 )));
     }
+
+    // url에 parameter가 들어가는 경우
+    @Test
+    @DisplayName("포인트 정책 유형 삭제 - 성공")
+    void testDeletePointPolicyType_success() {
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/admin/point-policy-types/{pointPolicyTypeId}", 1))
+            .andExpect(status().isOk())
+            .andDo(document("pointpolicytype/point-policy-type-delete",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("pointPolicyTypeId").description("포인트 정책 유형 번호")
+                )));
+
+    }
+
 }
 ----
 
