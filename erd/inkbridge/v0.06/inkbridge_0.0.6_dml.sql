@@ -24,8 +24,8 @@ VALUES (1, 'STANDARD', 1, 100000);
 
 # 멤버 권한 기본 값
 INSERT INTO member_auth
-VALUES (1, 'MEMBER'),
-       (2, 'ADMIN');
+VALUES (1, 'ROLE_MEMBER'),
+       (2, 'ROLE_ADMIN');
 
 # 멤버 상태 기본 값
 INSERT INTO member_status
@@ -44,3 +44,4 @@ VALUES (1, 'NORMAL'),
 INSERT INTO coupon_type
 VALUES (1, 'PERCENT'),
        (2, 'MONEY');
+
