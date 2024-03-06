@@ -57,10 +57,10 @@ CREATE TABLE `point_policy`
 
 CREATE TABLE `member_grade`
 (
-    `grade_id`        TINYINT     NOT NULL,
-    `grade`           VARCHAR(10) NOT NULL,
-    `point_rate`      DECIMAL     NOT NULL,
-    `standard_amount` BIGINT      NOT NULL,
+    `grade_id`        TINYINT        NOT NULL,
+    `grade`           VARCHAR(10)    NOT NULL,
+    `point_rate`      DECIMAL(10, 1) NOT NULL,
+    `standard_amount` BIGINT         NOT NULL,
 
     CONSTRAINT `member_grade_pk` PRIMARY KEY (`grade_id`)
 );
