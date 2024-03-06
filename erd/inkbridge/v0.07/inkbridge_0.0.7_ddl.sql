@@ -182,7 +182,7 @@ CREATE TABLE `book`
     `isbn`           CHAR(13)      NOT NULL,
     `regular_price`  BIGINT        NOT NULL,
     `price`          BIGINT        NOT NULL,
-    `discount_ratio` DECIMAL       NOT NULL DEFAULT 0,
+    `discount_ratio` DECIMAL(4,1)       NOT NULL DEFAULT 0,
     `stock`          INT           NOT NULL DEFAULT 0,
     `is_packagable`  BOOLEAN       NOT NULL DEFAULT FALSE,
     `status_id`      BIGINT        NOT NULL,
