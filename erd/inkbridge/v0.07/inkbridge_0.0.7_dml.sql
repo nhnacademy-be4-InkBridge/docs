@@ -20,7 +20,10 @@ VALUES (2, '2024-02-22');
 
 # 멤버 등급 기본 값
 INSERT INTO member_grade
-VALUES (1, 'STANDARD', 1, 100000);
+VALUES (1, 'STANDARD', 1.0, 0),
+       (2, 'ROYAL', 1.0, 100000),
+       (3, 'GOLD', 2.0, 200000),
+       (4, 'PLATINUM', 3.0, 300000);
 
 # 멤버 권한 기본 값
 INSERT INTO member_auth
