@@ -1,0 +1,79 @@
+# Nginx + L4 + 로드밸런싱
+
+## Nginx → reverse proxy , load balancing
+
+### 프록시?(Network proxy)
+
+→ 대리 ( 남을 대신하여 일을 처리함)
+
+### 클라이언트 - 프록시 - 서버
+
+- 클라이언트와 서버간의 중계 서버로, 통신을 대리 수행하는 서버
+- 캐시, 보안 , 트래픽 분산등의 장점을 가짐
+
+```java
+// 해당 라인 추가
+// 80 포트로 들어온 요청을 upstream으로 설정해준 위치로 다시 보냄
+// L4의 플로팅 ip로 보냄
+http {
+    upstream loadbalancer {
+-> 로드밸런싱할 서버들을 적어줌
+        server 133.186.215.136;
+    }
+
+    server {
+          listen 80;
+          server_name www.bookpub.store bookpub.store;      // domain 적용
+-> Ip,Domain 작성시 Nginx를 호스트함
+          location / {
+-> 특정 URL 경로에 대한 정의
+정적 파일 서빙, 프록시 패싱, redirection
+                proxy_set_header X-Forwarded-For $remote_addr;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header Host $http_host;
+                proxy_pass http://loadbalancer;
+-> reverse 프록시 구성 -> upstream 서버
+          }
+
+    }
+```
+
+### 라운드 로빙
+
+→ 요청들을 순차적으로 하나씩 보내는 방법
+
+## forward proxy
+
+클라이언트 -  proxy - internet - server
+
+특징
+
+- 캐싱 - 클라이언트가 요청한 내용을 캐싱
+- 1. 전송 시간 절약 , 2. 불필요한 외부 전송 x , 3. 외부 요청 감소 → 네트워크 병목 현상 방지
+
+- 익명성 - 클라이언트가 보낸 요청을 감춤
+- server가 응답 받은 요청을 누가 보냈는지 알지 못하게 함 / server가 받은 요청 IP = proxy IP
+
+## reverse proxy
+
+클라이언트 - internet - proxy - server
+
+특징
+
+- 캐싱 - forward랑 동일
+
+- 보안 - 서버 정보를 클라이언트로부터 숨김
+    - 클라이언트 입장에서 server는 reverse proxy
+    - 실제 서버의 ip가 노출되지 않음
+
+## load balancing
+
+- 부하분산 - 해야할 작업을 나누어 서버의 부하를 분산 시키는 것
+- why? - 서버가 점점 커지면서 부담이 된다. → scale up (server의 하드웨어 성능을 높이는 것) → 더욱 부하가 생김 → scale out (여러 대의 server가 나누어 일을 하는 것)
+- load balancer 종류
+    - L2, L3, L4,L7 → OSI 7 Layer 기준으로 어떤 것을 나누는지에 따라 다르다.
+    - L2 → Mac 주소를 바탕 L3 → IP 주소 바탕
+    - L4 Transport Layer (IP&Port) level에서  TCP/UDP , 도메인으로 접근시 서버 A, B로 로드 밸런싱
+    - L7 Application Layer (User Request) lelvel에서 load balancing (Https/http/ftp) 도메인으로 접근시  /member, /category 등 url에 따라서 즉, 담당 서버로들로 로드 밸런싱
+
+왜 l4를 썼고 , https를 왜 썼는가
