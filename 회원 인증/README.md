@@ -1,0 +1,183 @@
+# 회원 인증 발표 자료
+
+## Spring Security란?
+
+- Spring 기반의 애플리케이션 보안(인증과 권한,인가 등)을 담당하는 스프링 하위 프레임워크.
+- 인증, 권한은 Filter 흐름에 따라 처리한다.
+
+인증 (Authentication)
+
+- 로그인
+
+인가 (Authorization)
+
+- 한번 인증받은 사용자가 이후 여러 서비스 기능을 사용할 때 로그인 해 있다는걸 인지하고 허가
+- 로그인이 유지되어있는 상태에서 일어나는 일
+
+---
+
+## 기존 인증 방식
+
+### 세션  방식
+
+- 이 방법의 핵심은 사용자의 정보를 세션에 저장해 서버에서 관리 !
+- 클라이언트가 서버와 통신을 시작하면 유일한 값 session id 부여
+- 클라이언트에게 JSESSION 이라는 쿠키가 생기며 여기엔 session id가 저장되어있음
+- 이후 서버는 클라이언트가 보내는 요청에 담긴 JSESSION쿠키를 통해 세션 스토리지에 담긴 세션 id와 대조해서 인증한다
+
+![Untitled](%E1%84%92%E1%85%AC%E1%84%8B%E1%85%AF%E1%86%AB%20%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%8C%E1%85%B3%E1%86%BC%20%E1%84%87%E1%85%A1%E1%86%AF%E1%84%91%E1%85%AD%20%E1%84%8C%E1%85%A1%E1%84%85%E1%85%AD%202fda6b1de340469d8592413a7ff6adcb/Untitled.png)
+
+MSA 환경에서 생기는 문제점 
+
+→ 로드 밸런싱때문에 서버가 여러개가 생기므로 세션 클러스터링 또는 세션 스토리지 기술을 사용해야한다.
+
+→ 예) FRONT A 서버에서 세션에 저장하고 새로고침하고 B서버로 이동했다 치자 이때 B서버의 세션스토리지에는 클라이언트 정보가 없기때문에 사용자 인증이 불가능하다
+
+- 세션 방식이 안좋다는게 아니다 각각 장단점이 있으며 이러한 문제점은 레디스 + 세션 조합으로 해결이 가능하다
+
+---
+
+## JWT(JSON WEB TOKEN) 토큰 기반 인증 방식
+
+기존 세션id 방식에서 더 발전된 기술
+
+- 세션방식은 클라이언트 - 서버 모두 정보를 가지고있어야했으나
+- 토큰을 사용하면 요청 받은 서버는 토큰이 유효한지만 확인한다
+
+HTTP → Stateless (무상태성)
+
+- HTTP로 통신되는 클라이언트의 요청이 서버에 독립적으로 처리되며, 서버가 클라이언트에 대한 정보를 유지하거나 기억하지 않다는 것
+
+### CSRF disable 하는 이유 (CSRF에 대해서는 공부해보자)
+
+- 세션방식에서는 세션이 항상 고정되기 때문에 csrf 공격을 필수적으로 방어를 해야하나
+- jwt방식은 세션을 stateless 방식으로 관리하기 때문에 csrf에 대한 방어가 필수적이지 않다
+
+### 그렇다면 어떻게 유효한지 확인하나?
+
+그전에 jwt 구조에 대해 알아보자
+
+- jwt → header. payload. signature
+    - header → 토큰의 유형과 서명에 사용된 암호화 알고리즘에 대한 정보를 포함한다.
+    - Base64Url로 인코딩된다.
+
+- Payload → 사용자 정보 혹은  토큰 정보 등을 나타내는 클레임(Claim)을 포함한다.
+    - 예를 들어, 대상(sub), 발행 시간(iat), 만료 시간(exp) 등을 적을 수 있다.
+    - Base64Url로 인코딩됨.
+
+- signature → 토큰의 무결성을 보장하고 변조를 방지하기 위해 사용된다.
+    - 헤더와 페이로드를 Base64Url로 인코딩한 값을 , 비밀 키(Secret Key)와 함께 암호화해서 생성한다.
+    - 토큰의 변조 여부를 확인하려면 헤더와 페이로드를 비밀 키로 암호화한 값과 signature가 같은지 확인한다.
+
+![Untitled](%E1%84%92%E1%85%AC%E1%84%8B%E1%85%AF%E1%86%AB%20%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%8C%E1%85%B3%E1%86%BC%20%E1%84%87%E1%85%A1%E1%86%AF%E1%84%91%E1%85%AD%20%E1%84%8C%E1%85%A1%E1%84%85%E1%85%AD%202fda6b1de340469d8592413a7ff6adcb/Untitled%201.png)
+
+주의할 점 
+
+- header,payload는 인코딩될 뿐 암호화가 되지않는다. 즉 누구나 내용을 확인 가능
+- 따라서 민감한 개인정보는 절대 넣지 않는다. 넣더라도 암호화해서 넣어줌(UUID)
+- 하지만 verify signature는 시크릿 키를 알지 못하면 복호화 불가능
+- 따라서 시크릿 키 → 절대 대충 적지 않는다.(브루트포스로 뚫릴 가능성 있음) → private key, public key 로 나누기도 하나 프로젝트는 하나로 진행했음
+- A사용자가 자신의 클레임 안에 아이디를 B아이디로 바꾸더라도 signature는 A사용자 기반으로 암호화가 되어있기 때문에 유효하지 않은 토큰으로 간주한다.
+
+보안 이슈
+
+- alg → none 절대 금지 HS256사용한다.
+- 디코딩이 쉬움으로 민감한 개인정보는 넣지 않는다.
+- 시크릿키 대충 적지 않는다.
+- jwt 탈취 ? → jwt는 서버에서 관리할 수 없다.(세션은 탈취 당한경우 서버측에서 지워버리면 그만이지만 jwt는 사용자가 탈취를 당했을경우 서버측에서 막을 방법이 없다)
+- 물론 실제 회원이 토큰 탈취 이후, 한동안 로그인을 하지 않게 되면 그 동안은 해커가 계속해서 회원의 권한을 악용할 수 있으므로. 때문에 Jwt Token을 사용한 요청을 최대한 안전하게 만들기 위해, **HTTPS** 설정과 JWT 토큰 발급 시 **httpOnly, Secure** 설정을 한 쿠키로 발급하는 등의 방식을 통해서 토큰 탈취 가능성을 낮춰야한다.
+
+### 기존의 Access Token의 유효기간을 짧게 하고 Refresh Token이라는 새로운 토큰을 발급, 그렇게 되면 Access Token을 탈취 당해도 상대적으로 피해를 줄인다.
+
+두개의 토큰은 똑같은 형태의 jwt이며, 첫 로그인시 두개 모두 발급한다.
+
+Access 는 짧게 Refresh는 길게
+
+Access가 탈취 당하면 정보가 유출되는건 동일하나. 만료기간이 짧기에 조금더 안전하다는 점이 있다.
+
+Refresh의 만료기간이 지나면 새로 로그인 해야한다.
+
+Refresh도 탈취 당할 수 있다.(Refresh가 Access에 비해 털릴 일이 더 적다는거지 이것도 탈취당하면 답이 없다. 이를 방지하기위해 Refresh Rotation이라는 방법을 사용하기도 함 (궁금하면 공부하기)
+
+![Untitled](%E1%84%92%E1%85%AC%E1%84%8B%E1%85%AF%E1%86%AB%20%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%8C%E1%85%B3%E1%86%BC%20%E1%84%87%E1%85%A1%E1%86%AF%E1%84%91%E1%85%AD%20%E1%84%8C%E1%85%A1%E1%84%85%E1%85%AD%202fda6b1de340469d8592413a7ff6adcb/Untitled%202.png)
+
+이 방법의 문제점?
+
+- **구현이 복잡하다. 검증 프로세스가 매우 매우 길어서 구현하기 매우 매우 힘들다.**
+- 재발급 받는 과정에서 HTTP 요청 횟수가 많기에 서버 자원 낭비로 이어질 수 있다.
+
+JWT의 Access ,Refresh의 기간 설정은 정답은 없다 자신의 사이트의 특성에 맞게 설정하자
+
+그리고 Session VS Jwt 이것도 내가 볼땐 정답이 없다 각자 알아서 선택하면될듯 서로 장단점이 분명하다
+
+개인적인 생각으로 Session + Redis 조합이 괜찮아 보임
+
+이제 다시 Spring Security
+
+![Untitled](%E1%84%92%E1%85%AC%E1%84%8B%E1%85%AF%E1%86%AB%20%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%8C%E1%85%B3%E1%86%BC%20%E1%84%87%E1%85%A1%E1%86%AF%E1%84%91%E1%85%AD%20%E1%84%8C%E1%85%A1%E1%84%85%E1%85%AD%202fda6b1de340469d8592413a7ff6adcb/Untitled%203.png)
+
+1. 사용자가 로그인 정보와 함께 인증을 요청
+2. Authentication Filter가 POST: /login 요청을 가로 챈 뒤, UsernamePasswordAuthenticationToken의 인증용 객체를 생성
+3. AuthenticationManager의 구현체인 ProviderMangaer에게 생성한 인증 토큰을 전달
+4. AuthenticationManager는 등록된 AuthenticationProvider를 조회해 인증을 시도
+5. 실제 DB에서 사용자 인증 정보를 가져오는 UserDetailService에 사용자 정보를 전달
+6. 넘겨받은 사용자 정보를 토대로 DB에서 진짜 정보를 가져와 UserDetail 객체 만든다.
+7. AuthenticationProvider는 UserDetails를 넘겨받고 사용자 정보를 비교
+8. 인증이 완료되면 권한 등의 사용자 정보를 담은 Authentication 객체가 반환된다.
+9. SecurityContext에 객체 저장
+
+AuthenticationFIlter를 상속받아 직접 구현한 필터를 Config에서 필터에 추가한다.
+
+AuthenticationManager란?
+
+```java
+public interface AuthenticationManager {
+
+	Authentication authenticate(Authentication authentication) throws AuthenticationException;
+
+}
+```
+
+Authentication 요청을 처리한다.
+
+ProviderManager( AuthenticationManager 구현체)
+
+적합한 인증 제공자 찾아주는 역할 !
+
+ProviderManager는 AuthenticationProvider를 여러개 가지고 있다.
+
+![Untitled](%E1%84%92%E1%85%AC%E1%84%8B%E1%85%AF%E1%86%AB%20%E1%84%8B%E1%85%B5%E1%86%AB%E1%84%8C%E1%85%B3%E1%86%BC%20%E1%84%87%E1%85%A1%E1%86%AF%E1%84%91%E1%85%AD%20%E1%84%8C%E1%85%A1%E1%84%85%E1%85%AD%202fda6b1de340469d8592413a7ff6adcb/Untitled%204.png)
+
+ProviderManager는 어떤 AuthenticationProvider가 null이 아닌 return을 제공할때까지 목록을 차례로 반복
+
+null이 아닌 값을 반환받으면 다음을 시도하지 않는다.
+
+AuthenticationProvider가 요청을 성공적으로 인증하면 성공한 인증이 사용된다.
+
+쉽게 말해 Authentication을 잘 처리 할 수있는 provider가 나타날 때까지 쭉 흝어봄.
+
+프론트에서 contextholder에 매요청시마다 token을 통해 유저 정보를 가져와 userDetail 객체를 넣어서 만들어주고 1회 요청시마다 사용해서 만들고 삭제한다.
+
+security Filter 순서 매우 중요
+
+Jwt 같은 클레임 기반 토큰을 사용하면 리프레쉬도 서버에 저장할 이유는 없지만 하지만, 사용자 강제 로그아웃 기능, 유저 차단, 토큰 탈취시 대응을 위해 레디스에 저장하는게 나쁘지 않다 판단
+
+## 실제 코드를 보며 흐름 설명
+
+REFERENCE
+
+[[SpringBoot] Spring Security란?](https://mangkyu.tistory.com/76)
+
+[[Spring Security] 스프링 시큐리티의 동작 구조](https://memodayoungee.tistory.com/135?category=1061482)
+
+[서버 인증 방식(세션/쿠키, 토큰)](https://velog.io/@kingth/서버-인증-방식세션쿠키-토큰)
+
+더 공부해보면 좋을것들
+
+[[SpringSecurity] AuthenticationManger 과정 코드 뜯어보기 / 총정리](https://velog.io/@on5949/SpringSecurity-Authentication-과정-정리)
+
+[Refresh Token Rotation 과 Redis로 토큰 탈취 시나리오 대응](https://junior-datalist.tistory.com/352)
+
+[Redis 를 통한 JWT Blacklist 구현](https://velog.io/@boo105/Redis-를-통한-JWT-Blacklist-구현)
+
+[CSRF란, CSRF 동작원리, CSRF 방어방법](https://devscb.tistory.com/123)
