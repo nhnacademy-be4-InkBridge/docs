@@ -48,3 +48,10 @@ INSERT INTO coupon_type
 VALUES (1, 'PERCENT'),
        (2, 'MONEY');
 
+# 주문 상태
+INSERT INTO book_order_status
+VALUES (1, 'WAITING'),
+  (2, 'SHPPING'),
+  (3, 'DONE'),
+  (4, 'RETURN'),
+  (5, 'WITHDRAW');
