@@ -28,7 +28,8 @@ VALUES (1, 'STANDARD', 1.0, 0),
 # 멤버 권한 기본 값
 INSERT INTO member_auth
 VALUES (1, 'ROLE_MEMBER'),
-       (2, 'ROLE_ADMIN');
+       (2, 'ROLE_ADMIN'),
+       (3, 'ROLE_SOCIAL');
 
 # 멤버 상태 기본 값
 INSERT INTO member_status
