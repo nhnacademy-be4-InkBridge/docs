@@ -347,7 +347,7 @@ CREATE TABLE `coupon`
 
 CREATE TABLE `member_coupon`
 (
-    `member_coupon_id` BIGINT NOT NULL,
+    `member_coupon_id` BIGINT NOT NULL AUTO_INCREMENT,
     `member_id`        BIGINT       NOT NULL,
     `coupon_id`        VARCHAR(200) NOT NULL,
     `expired_at`       DATE         NOT NULL,
@@ -428,7 +428,7 @@ CREATE TABLE `book_order_status`
 
 CREATE TABLE `book_order`
 (
-    `order_id`        BIGINT  NOT NULL,
+    `order_id`        BIGINT  NOT NULL AUTO_INCREMENT,
     `order_code`      VARCHAR(64) NOT NULL,
     `order_name`      VARCHAR(64)  NOT NULL,
     `ship_date`       DATE NULL,
@@ -513,6 +513,9 @@ CREATE TABLE `pay`
     `total_amount`   BIGINT       NOT NULL,
     `balance_amount` BIGINT       NOT NULL,
     `order_id`       BIGINT  NOT NULL,
+    `vat` BIGINT NOT NULL,
+    `is_partial_cancelable` BOOLEAN NOT NULL,
+    `provider` VARCHAR(32) NOT NULL,
 
     CONSTRAINT `pay_pk` PRIMARY KEY (`pay_id`),
     CONSTRAINT `pay_book_order_fk` FOREIGN KEY (`order_id`) REFERENCES `book_order` (`order_id`)
