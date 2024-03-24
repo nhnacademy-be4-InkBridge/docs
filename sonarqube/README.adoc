@@ -8,3 +8,9 @@ image:images/third-deployment.png[]
 
 == 4차 배포
 image:images/fourth-deployment.png[]
+
+== 5차 배포
+image:images/fifth-development.png[]
+
+== 6차 배포
+image::images/sixth-development.png[]
