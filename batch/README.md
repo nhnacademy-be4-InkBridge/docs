@@ -43,7 +43,7 @@ Batch 와 같이 **대용량 데이터 배치 처리에 대한 기능을 지원
 
 ## 4. 배치 프로젝트 시작
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/6814f0fe-3c31-4d32-bcd5-3930d906bcaf/a63231f8-7d95-4beb-8e40-957f0d232246/Untitled.png)
+![batch1](./img/batch1.png)
 
 > **스프링 배치 아키텍쳐**
 > 
@@ -76,7 +76,7 @@ public class BatchApplication {
 spring.batch.jdbc.initialize-schema=always
 ```
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/6814f0fe-3c31-4d32-bcd5-3930d906bcaf/303eef46-f075-4bd9-a06e-35547363820f/Untitled.png)
+![batch2](./img/batch2.png)
 
 메타 테이블이 궁금하다면?
 https://jojoldu.tistory.com/326
@@ -110,13 +110,12 @@ public class SimpleJobConfiguration {
 }
 ```
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/6814f0fe-3c31-4d32-bcd5-3930d906bcaf/85d30553-2a6d-444f-b62e-cff656f4e9b1/Untitled.png)
+![batch3](./img/batch3.png)
+
 
 그림과 같이 스텝에는 두종류가 있다 바로 TaskLet과 Reader,Procerssor,Writer묶음이다.
 
-당연히 rader procerssor후에 tasklet을 마무리를 하지못한다.
-
-만약 ㅈㅈ    
+당연히 rader procerssor후에 tasklet을 마무리를 하지못한다.    
 
 ```java
 public class StepNextConditionalJobConfiguration {
@@ -343,3 +342,5 @@ public class BirthdayCouponJobConfig {
 ```
 
 다음중 개선이 필요한 코드는 writer이다 현재 영속성을 가지고있음에도 불구하고 청크단위가 10일때 17개의 데이터가 들어온다면 7개의 데이터가 처리가되지않는다. 그래서 writer에서 강제적으로 entity매니저를 통해 저장시켜줫는데 좋지못한방법이라 생각한다.
+
+참고 : https://jojoldu.tistory.com/
