@@ -1,7 +1,11 @@
 # tui-editor
+## TOAST UI EDITOR?
+- NHN Cloud에서 개발한 오픈 소스 라이브러리로 markdown과 wysiwyg 방식 모두를 지원하는 무료 에디터입니다.
+- npm을 통한 설치는 Node.js 환경에서만 가능하기 때문에 순수 javaScript로 CDN을 통해 소스 코드를 불러오는 방법을 사용했습니다.
+<br>
 
 ## 사용 방법
-- npm을 통한 설치는 Node.js 환경에서만 가능하기 때문에 순수 javaScript로 CDN을 통해 소스 코드를 불러오는 방법을 사용했습니다.
+<br>
 
 ~~~
 
